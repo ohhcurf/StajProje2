@@ -318,6 +318,8 @@ namespace StajProje2
                     timer.Stop();
                     consumableTimer.Stop();
                     scoreLimitTextBox.Enabled = true;
+                    consTimer = 0;
+                    Form_Load();
                     return;
                 }
 
@@ -335,6 +337,8 @@ namespace StajProje2
                     timer.Stop();
                     consumableTimer.Stop();
                     scoreLimitTextBox.Enabled = true;
+                    consTimer = 0;
+                    Form_Load();
                     return;
                 }
             }
@@ -359,6 +363,8 @@ namespace StajProje2
                 timer.Stop();
                 consumableTimer.Stop();
                 scoreLimitTextBox.Enabled = true;
+                consTimer = 0;
+                Form_Load();
             }
         }
 
@@ -529,6 +535,33 @@ namespace StajProje2
             }
         }
 
+        private void Form_Load()
+        {
+            var scores = ReadData_Scoreboard();
+            mapScores = scores.Where(p => p.map == selectedMap.Name).ToList();
+
+            if (mapScores.Count() == 0)
+            {
+                maxScoreLabel.Text = "0";
+            }
+            else
+            {
+                var maxScore = mapScores.OrderByDescending(p => p.score).FirstOrDefault().score;
+                maxScoreLabel.Text = maxScore.ToString();
+
+                var yourScore = mapScores.Where(p => p.username == usernameLabel.Text).FirstOrDefault();
+
+                if (yourScore != null)
+                {
+                    var yourMaxScore = mapScores.Where(p => p.username == usernameLabel.Text).OrderByDescending(p => p.score).FirstOrDefault().score;
+                    yourMaxLabel.Text = yourMaxScore.ToString();
+                }
+                else
+                {
+                    yourMaxLabel.Text = "0";
+                }
+            }
+        }
         // MainMenuForm'dan gelen map verilerini kullanarak panel'e engelleri yerleştirip map oluşturma
         private void CreatePanelsFromCoordinates(string coordinates)
         {

@@ -5,3 +5,11 @@ Mehmet;Map1;200
 Mehmet;Map1;1280
 asd;Map1;1005
 ads;Map1;350
+asd;Map1;150
+asd;Map1;905
+fdh;Map1;50
+fdh;Map1;100
+fdh;Map1;0
+fdh;Map1;115
+fdh;Map1;50
+fdh;Map1;150
