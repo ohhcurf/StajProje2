@@ -1,0 +1,4 @@
+Armut;5;15;25;Color [A=255, R=0, G=255, B=0];Boyun uzamaz ama az puan verir;0;0;0
+Muz;5;30;15;Color [A=255, R=255, G=255, B=0];Boy uzamaz, az puan verir. 2 Kat hızlandırır.;0;0;2
+kavun;5;40;15;Color [A=255, R=248, G=219, B=193];puanı az, boy uzatmaz. 2 Kat yavaşlatır.;0;2;0
+süt;3;55;200;Color [A=255, R=255, G=226, B=248];Puanı ve uzaması çok.;2;0;0

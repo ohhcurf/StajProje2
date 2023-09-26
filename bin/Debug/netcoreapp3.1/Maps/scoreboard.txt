@@ -1,0 +1,7 @@
+Mehmet;default;0
+Mehmet;Map1;1215
+Mehmet;Map1;100
+Mehmet;Map1;200
+Mehmet;Map1;1280
+asd;Map1;1005
+ads;Map1;350
