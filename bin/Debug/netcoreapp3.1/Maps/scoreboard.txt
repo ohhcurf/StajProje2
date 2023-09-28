@@ -34,3 +34,4 @@ asdd;Map1;140
 asdd;Map1;100
 asdsadas;Map1;600
 asdsadsa;Map1;350
+asdsads;Map1;625

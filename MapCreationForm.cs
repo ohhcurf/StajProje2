@@ -27,36 +27,7 @@ namespace StajProje2
         }
 
 
-
-
-        // Map verilerini oku
-        private List<MapClass> ReadData_Map()
-        {
-            List<MapClass> maps = new List<MapClass> { };
-
-            using (StreamReader sr = new StreamReader(Paths.MapsPath))
-            {
-                string line;
-                List<string> lines = new List<string>();
-
-                while ((line = sr.ReadLine()) != null)
-                {
-                    string[] cut = line.Split(';');
-
-                    MapClass map = new MapClass()
-                    {
-                        Name = cut[0],
-                    };
-                    maps.Add(map);
-
-                    lines.Add(line);
-                }
-                return maps;
-            }
-        }
-
-
-
+        
 
         private void mapPanel_MouseClick(object sender, MouseEventArgs e)
         {
@@ -138,7 +109,7 @@ namespace StajProje2
 
         private void createButton_Click(object sender, EventArgs e)
         {
-            var maps = ReadData_Map();
+            var maps = Paths.ReadData_Map();
             var result = maps.Where(p => p.Name == nameBox.Text).ToList();
 
             if (result.Count() != 0)

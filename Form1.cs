@@ -437,68 +437,7 @@ namespace StajProje2
             }
         }
 
-        // Yem verilerini oku
-        private List<ConsumableClass> ReadData_Consumables()
-        {
-            List<ConsumableClass> consumables = new List<ConsumableClass> { };
-
-            using (StreamReader sr = new StreamReader(Paths.ConsPath))
-            {
-                string line;
-                List<string> lines = new List<string>();
-
-                while ((line = sr.ReadLine()) != null)
-                {
-                    string[] cut = line.Split(';');
-
-                    ConsumableClass consumable = new ConsumableClass()
-                    {
-                        Name = cut[0],
-                        Lifetime = float.Parse(cut[1]),
-                        SpawnRate = float.Parse(cut[2]),
-                        Point = float.Parse(cut[3]),
-                        Color = ParseColorString(cut[4]),
-                        Description = cut[5],
-                        Spawned = false,
-                        Expand = int.Parse(cut[6]),
-                        SpeedDown = int.Parse(cut[7]),
-                        SpeedUp = int.Parse(cut[8]),
-                    };
-                    consumables.Add(consumable);
-
-                    lines.Add(line);
-                }
-                return consumables;
-            }
-        }
-
-        // Skor tablosu verilerini oku
-        private List<ScoreClass> ReadData_Scoreboard()
-        {
-            List<ScoreClass> scores = new List<ScoreClass> { };
-
-            using (StreamReader sr = new StreamReader(Paths.ScoreboardPath))
-            {
-                string line;
-                List<string> lines = new List<string>();
-
-                while ((line = sr.ReadLine()) != null)
-                {
-                    string[] cut = line.Split(';');
-
-                    ScoreClass score = new ScoreClass()
-                    {
-                        Username = cut[0],
-                        Map = cut[1],
-                        score = int.Parse(cut[2]),
-                    };
-                    scores.Add(score);
-
-                    lines.Add(line);
-                }
-                return scores;
-            }
-        }
+        
 
 
 
@@ -522,9 +461,9 @@ namespace StajProje2
             usernameLabel.Text = usernameInput;
             maxScoreLabel.Text = "0";
             CreatePanelsFromCoordinates(selectedMap.Obstacles);
-            consumableList = ReadData_Consumables();
+            consumableList = Paths.ReadData_Consumables();
 
-            var scores = ReadData_Scoreboard();
+            var scores = Paths.ReadData_Scoreboard();
             mapScores = scores.Where(p => p.Map == selectedMap.Name).ToList();
 
             if (mapScores.Count() == 0)
@@ -552,7 +491,7 @@ namespace StajProje2
 
         private void Form_Load()
         {
-            var scores = ReadData_Scoreboard();
+            var scores = Paths.ReadData_Scoreboard();
             mapScores = scores.Where(p => p.Map == selectedMap.Name).ToList();
 
             if (mapScores.Count() == 0)
@@ -660,26 +599,6 @@ namespace StajProje2
         // Diğer
         //
 
-        // String'e çevrilmiş renk verisini okuyarak tekrardan renk oluşturma
-        private static Color ParseColorString(string colorString)
-        {
-            Regex regex = new Regex(@"\[(A=\d+), (R=\d+), (G=\d+), (B=\d+)\]");
-            Match match = regex.Match(colorString);
-
-            if (match.Success)
-            {
-                int alpha = int.Parse(match.Groups[1].Value.Split('=')[1]);
-                int red = int.Parse(match.Groups[2].Value.Split('=')[1]);
-                int green = int.Parse(match.Groups[3].Value.Split('=')[1]);
-                int blue = int.Parse(match.Groups[4].Value.Split('=')[1]);
-
-                return Color.FromArgb(alpha, red, green, blue);
-            }
-            else
-            {
-                throw new FormatException("Geçersiz format.");
-            }
-        }
 
         // Skor limit kutusuna sadece sayı girilmesi
         private void scoreLimit_KeyPress(object sender, KeyPressEventArgs e)

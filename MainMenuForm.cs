@@ -41,7 +41,7 @@ namespace StajProje2
                 }
             }
 
-            MapClass map = ReadData(1, 0);
+            MapClass map = Paths.ReadData_Map(1, 0);
             Image originalImage = Image.FromFile(Path.Combine(Paths.FolderPath, map.Image));
             levelPicture.Image = ScaleImage(originalImage, levelPicture.Size);
             levelNameLabel.Text = map.Name;
@@ -51,60 +51,12 @@ namespace StajProje2
 
 
 
-        // map.txt dosyasından mevcut mapleri okur
-        private MapClass ReadData(int amount, int rule)
-        {
-            MapClass newMap = new MapClass { };
-
-            string maps = string.Empty;
-            int maxLine = amount + lineNum;
-            if (rule > 0) maxLine = int.MaxValue;
-
-            using (StreamReader sr = new StreamReader(Paths.MapsPath))
-            {
-                string line;
-                List<string> lines = new List<string>();
-
-                for (int i = 0; i < lineNum; i++)
-                {
-                    sr.ReadLine();
-                }
-
-                while ((line = sr.ReadLine()) != null)
-                {
-                    string[] cut = line.Split(';');
-
-                    newMap.Name = cut[0];
-                    newMap.Image = cut[1];
-                    if (cut.Length > 2) newMap.Obstacles = cut[2];
-
-                    lines.Add(line);
-                    lineNum++;
-
-                    if (lineNum >= maxLine)
-                    {
-                        lines.Clear();
-                        return newMap;
-                    }
-                }
-                if (rule > 0)
-                {
-                    return newMap;
-                }
-                return null;
-            }
-        }
-
-
-
-
         private void nextButton_Click(object sender, EventArgs e)
         {
-            var map = ReadData(1, 0);
+            var map = Paths.ReadData_Map(1, 0);
             if (map == null)
             {
-                lineNum = 0;
-                map = ReadData(1, 0);
+                map = Paths.ReadData_Map(1, 2);
             }
             Image originalImage = Image.FromFile(Path.Combine(Paths.FolderPath, map.Image));
             levelPicture.Image = ScaleImage(originalImage, levelPicture.Size);
@@ -118,17 +70,17 @@ namespace StajProje2
 
             if (lineNum == 1)
             {
-                map = ReadData(1, 1);
+                map = Paths.ReadData_Map(1, 1);
             }
             else
             {
                 lineNum -= 2;
-                map = ReadData(1, 0);
+                map = Paths.ReadData_Map(1, 0);
             }
             if (map == null)
             {
                 lineNum = 0;
-                map = ReadData(1, 0);
+                map = Paths.ReadData_Map(1, 0);
             }
             Image originalImage = Image.FromFile(Path.Combine(Paths.FolderPath, map.Image));
             levelPicture.Image = ScaleImage(originalImage, levelPicture.Size);
