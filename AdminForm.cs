@@ -36,5 +36,10 @@ namespace StajProje2
             form.Show();
             this.Close();
         }
+
+        private void AdminForm_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

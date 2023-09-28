@@ -13,10 +13,7 @@ namespace StajProje2
 {
     public partial class ConsumableForm : Form
     {
-        static string mainpath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        static string mapPath = Path.Combine(mainpath, "Maps");
-        static string mapTxtPath = Path.Combine(mainpath, $"Maps\\maps.txt");
-        static string consumableTxtPath = Path.Combine(mainpath, $"Maps\\consumables.txt");
+        Paths Paths = new Paths();
         public ConsumableForm()
         {
             InitializeComponent();
@@ -112,25 +109,25 @@ namespace StajProje2
 
             ConsumableClass newConsumable = new ConsumableClass()
             {
-                name = nameBox.Text,
-                description = descRichTextBox.Text,
-                lifetime = float.Parse(lifetimeBox.Text),
-                spawnRate = float.Parse(periodBox.Text),
-                point = float.Parse(pointBox.Text),
-                color = Color.FromArgb(alphaTrackBar.Value, redTrackBar.Value, greenTrackBar.Value, blueTrackBar.Value),
-                expand = 0,
-                speedDown = 0,
-                speedUp = 0,
+                Name = nameBox.Text,
+                Description = descRichTextBox.Text,
+                Lifetime = float.Parse(lifetimeBox.Text),
+                SpawnRate = float.Parse(periodBox.Text),
+                Point = float.Parse(pointBox.Text),
+                Color = Color.FromArgb(alphaTrackBar.Value, redTrackBar.Value, greenTrackBar.Value, blueTrackBar.Value),
+                Expand = 0,
+                SpeedDown = 0,
+                SpeedUp = 0,
             };
-            if (lengthCheckBox.Checked == true) newConsumable.expand = lengthSlider.Value;
-            if (speeddownCheckBox.Checked == true) newConsumable.speedDown = speeddownSlider.Value;
-            if (speedupCheckBox.Checked == true) newConsumable.speedUp = speedupSlider.Value;
+            if (lengthCheckBox.Checked == true) newConsumable.Expand = lengthSlider.Value;
+            if (speeddownCheckBox.Checked == true) newConsumable.SpeedDown = speeddownSlider.Value;
+            if (speedupCheckBox.Checked == true) newConsumable.SpeedUp = speedupSlider.Value;
 
             try
             {
-                string metin = newConsumable.name + ";" + newConsumable.lifetime + ";" + newConsumable.spawnRate + ";" + newConsumable.point + ";" + newConsumable.color + ";" +
-                    newConsumable.description + ";" + newConsumable.expand + ";" + newConsumable.speedDown + ";" + newConsumable.speedUp;
-                File.AppendAllText(consumableTxtPath, Environment.NewLine + metin);
+                string metin = newConsumable.Name + ";" + newConsumable.Lifetime + ";" + newConsumable.SpawnRate + ";" + newConsumable.Point + ";" + newConsumable.Color + ";" +
+                    newConsumable.Description + ";" + newConsumable.Expand + ";" + newConsumable.SpeedDown + ";" + newConsumable.SpeedUp;
+                File.AppendAllText(Paths.ConsPath, Environment.NewLine + metin);
             }
             catch (Exception ex)
             {

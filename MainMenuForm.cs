@@ -15,10 +15,7 @@ namespace StajProje2
     public partial class MainMenuForm : Form
     {
         static int lineNum;
-
-        static string mainPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        static string mapPath = Path.Combine(mainPath, "Maps");
-        static string mapTxtPath = Path.Combine(mainPath, $"Maps\\maps.txt");
+        Paths Paths = new Paths();
 
         static MapClass selectedMap = new MapClass();
 
@@ -28,7 +25,7 @@ namespace StajProje2
 
             lineNum = 0;
 
-            if (File.Exists(mapTxtPath))
+            if (File.Exists(Paths.MapsPath))
             {
                 Console.WriteLine("Dosya zaten mevcut.");
             }
@@ -36,7 +33,7 @@ namespace StajProje2
             {
                 try
                 {
-                    File.WriteAllText(mapTxtPath, "default;deault.png");
+                    File.WriteAllText(Paths.FolderPath, "default;deault.png");
                 }
                 catch (Exception ex)
                 {
@@ -45,7 +42,7 @@ namespace StajProje2
             }
 
             MapClass map = ReadData(1, 0);
-            Image originalImage = Image.FromFile(Path.Combine(mapPath, map.Image));
+            Image originalImage = Image.FromFile(Path.Combine(Paths.FolderPath, map.Image));
             levelPicture.Image = ScaleImage(originalImage, levelPicture.Size);
             levelNameLabel.Text = map.Name;
             selectedMap = map;
@@ -63,7 +60,7 @@ namespace StajProje2
             int maxLine = amount + lineNum;
             if (rule > 0) maxLine = int.MaxValue;
 
-            using (StreamReader sr = new StreamReader(mapTxtPath))
+            using (StreamReader sr = new StreamReader(Paths.MapsPath))
             {
                 string line;
                 List<string> lines = new List<string>();
@@ -109,7 +106,7 @@ namespace StajProje2
                 lineNum = 0;
                 map = ReadData(1, 0);
             }
-            Image originalImage = Image.FromFile(Path.Combine(mapPath, map.Image));
+            Image originalImage = Image.FromFile(Path.Combine(Paths.FolderPath, map.Image));
             levelPicture.Image = ScaleImage(originalImage, levelPicture.Size);
             levelNameLabel.Text = map.Name;
             selectedMap = map;
@@ -133,7 +130,7 @@ namespace StajProje2
                 lineNum = 0;
                 map = ReadData(1, 0);
             }
-            Image originalImage = Image.FromFile(Path.Combine(mapPath, map.Image));
+            Image originalImage = Image.FromFile(Path.Combine(Paths.FolderPath, map.Image));
             levelPicture.Image = ScaleImage(originalImage, levelPicture.Size);
             levelNameLabel.Text = map.Name;
             selectedMap = map;

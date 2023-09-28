@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using StajProje2.Classes;
@@ -13,16 +14,11 @@ namespace StajProje2
 {
     public partial class Form1 : Form
     {
-        static int satirSayisi;
-
-        static string mainpath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        static string consPath = Path.Combine(mainpath, "Maps\\consumables.txt");
-        static string scoreboardPath = Path.Combine(mainpath, "Maps\\scoreboard.txt");
-
+        Paths Paths = new Paths();
         static int consTimer;
         bool coolDown;
         int scoreLimit = 0;   
-        string direction = "sağ";
+
 
         MapClass selectedMap = new MapClass();
         List<ConsumableClass> consumableList = new List<ConsumableClass>();
@@ -34,6 +30,17 @@ namespace StajProje2
         List<Panel> snake = new List<Panel>();
         List<Panel> obstacles = new List<Panel>();
         List<Panel> consumableToRemove = new List<Panel>();
+
+
+        public enum SnakeDirection
+        {
+        Up,
+        Down,
+        Left,
+        Right
+        }
+
+        SnakeDirection direction = SnakeDirection.Right; // Başlangıçta sağ yönde başlayın
 
         
 
@@ -73,44 +80,10 @@ namespace StajProje2
         // Ticks
         private void Timer_Tick(object sender, EventArgs e)
         {
-            int snakeX = this.snake[0].Location.X;
-            int snakeY = this.snake[0].Location.Y;
-
             isConsumed();
             Movement();
             Collision_Control();
             Score_Control();
-
-            if (direction == "sağ")
-            {
-                if (snakeX < 580)
-                    snakeX += 20;
-                else
-                    snakeX = 0;
-            }
-            if (direction == "sol")
-            {
-                if (snakeX > 0)
-                    snakeX -= 20;
-                else
-                    snakeX = 580;
-            }
-            if (direction == "aşağı")
-            {
-                if (snakeY < 580)
-                    snakeY += 20;
-                else
-                    snakeY = 0;
-            }
-            if (direction == "yukarı")
-            {
-                if (snakeY > 0)
-                    snakeY -= 20;
-                else
-                    snakeY = 580;
-            }
-
-            this.snake[0].Location = new Point(snakeX, snakeY);
         }
         // Saniyelik Tick
         private void Consumable_Tick(object sender, EventArgs e)
@@ -119,9 +92,9 @@ namespace StajProje2
 
             foreach (var consumable in consumableList)
             {
-                if ((consTimer - consumable.lifetime) % consumable.spawnRate == 0)
+                if ((consTimer - consumable.Lifetime) % consumable.SpawnRate == 0)
                 {
-                    Panel selectedPanel = gamePanel.Controls.OfType<Panel>().FirstOrDefault(p => p.Name == consumable.name);
+                    Panel selectedPanel = gamePanel.Controls.OfType<Panel>().FirstOrDefault(p => p.Name == consumable.Name);
 
                     if (selectedPanel != null && selectedPanel.Parent != null)
                     {
@@ -129,7 +102,7 @@ namespace StajProje2
                     }
                 }
 
-                if (consTimer % consumable.spawnRate == 0)
+                if (consTimer % consumable.SpawnRate == 0)
                 {
                     Spawn_Consumable(consumable);
                 }
@@ -212,8 +185,8 @@ namespace StajProje2
             {
                 Size = new Size(20, 20),
                 Location = new Point(consX, consY),
-                BackColor = consToSpawn.color,
-                Name = consToSpawn.name,
+                BackColor = consToSpawn.Color,
+                Name = consToSpawn.Name,
             };
 
             foreach (var obstacle in obstacles)
@@ -254,31 +227,31 @@ namespace StajProje2
             {
                 if (snake[0].Location == consumablePanel.Location)
                 {
-                    var consType = consumableList.First(p => p.name == consumablePanel.Name);
-                    score += (int)consType.point;
+                    var consType = consumableList.First(p => p.Name == consumablePanel.Name);
+                    score += (int)consType.Point;
                     scoreValueLabel.Text = score.ToString();
 
-                    for (int i = 0; i < consType.expand; i++)
+                    for (int i = 0; i < consType.Expand; i++)
                     {
                         Unit_Addition();
                     }
 
-                    if (consType.speedUp > 0)
+                    if (consType.SpeedUp > 0)
                     {
-                        timer.Interval = timer.Interval / consType.speedUp;
+                        timer.Interval = timer.Interval / consType.SpeedUp;
                         Timer newTimer = new Timer();
                         newTimer.Interval = 10000; // 10 saniye
                         newTimer.Start();
-                        newTimer.Tag = Tuple.Create(0, consType.speedUp);
+                        newTimer.Tag = Tuple.Create(0, consType.SpeedUp);
                         newTimer.Tick += new EventHandler(speedTick);
                     }
-                    if (consType.speedDown > 0)
+                    if (consType.SpeedDown > 0)
                     {
-                        timer.Interval = timer.Interval * consType.speedDown;
+                        timer.Interval = timer.Interval * consType.SpeedDown;
                         Timer newTimer = new Timer();
                         newTimer.Interval = 10000; // 10 saniye
                         newTimer.Start();
-                        newTimer.Tag = Tuple.Create(1, consType.speedDown);
+                        newTimer.Tag = Tuple.Create(1, consType.SpeedDown);
                         newTimer.Tick += new EventHandler(speedTick);
                     }
                     consumableToRemove.Add(consumablePanel);
@@ -367,39 +340,81 @@ namespace StajProje2
                 Form_Load();
             }
         }
-
+        
         // Hareket
         void Movement()
         {
-            for (int i = snake.Count - 1; i > 0; i--)
-                snake[i].Location = snake[i - 1].Location;
+            int snakeX = this.snake[0].Location.X;
+            int snakeY = this.snake[0].Location.Y;
+
+            snake[0].BackColor = Color.Gray;
+            var newHead = new Panel();
+            newHead.Size = new Size(20, 20);
+            newHead.BackColor = Color.Blue;
+            
+
+            if (direction == SnakeDirection.Right)
+            {
+                if (snakeX < 580)
+                    snakeX += 20;
+                else
+                    snakeX = 0;
+            }
+            if (direction == SnakeDirection.Left)
+            {
+                if (snakeX > 0)
+                    snakeX -= 20;
+                else
+                    snakeX = 580;
+            }
+            if (direction == SnakeDirection.Down)
+            {
+                if (snakeY < 580)
+                    snakeY += 20;
+                else
+                    snakeY = 0;
+            }
+            if (direction == SnakeDirection.Up)
+            {
+                if (snakeY > 0)
+                    snakeY -= 20;
+                else
+                    snakeY = 580;
+            }
+
+            snake.Insert(0, newHead);
+            gamePanel.Controls.Add(newHead);
+            gamePanel.Controls.Remove(snake[snake.Count() - 1]);
+            snake.RemoveAt(snake.Count() - 1);
+            newHead.Location = new Point(snakeX, snakeY);
             coolDown = false;
         }
 
         // Yön tuşları okuyucu
         private void KeyDown_Reader(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Right && direction != "sol" && coolDown == false)
+            if (e.KeyCode == Keys.Right && direction != SnakeDirection.Left && coolDown == false)
             {
-                direction = "sağ";
+                direction = SnakeDirection.Right;
                 coolDown = true;
             }
-            if (e.KeyCode == Keys.Left && direction != "sağ" && coolDown == false)
+            if (e.KeyCode == Keys.Left && direction != SnakeDirection.Right && coolDown == false)
             {
-                direction = "sol";
+                direction = SnakeDirection.Left;
                 coolDown = true;
             }
-            if (e.KeyCode == Keys.Up && direction != "aşağı" && coolDown == false)
+            if (e.KeyCode == Keys.Up && direction != SnakeDirection.Down && coolDown == false)
             {
-                direction = "yukarı";
+                direction = SnakeDirection.Up;
                 coolDown = true;
             }
-            if (e.KeyCode == Keys.Down && direction != "yukarı" && coolDown == false)
+            if (e.KeyCode == Keys.Down && direction != SnakeDirection.Up && coolDown == false)
             {
-                direction = "aşağı";
+                direction = SnakeDirection.Down;
                 coolDown = true;
             }
         }
+
 
 
 
@@ -414,7 +429,7 @@ namespace StajProje2
             try
             {
                 string text = usernameLabel.Text + ";" + selectedMap.Name + ";" + scoreValueLabel.Text;
-                File.AppendAllText(scoreboardPath, Environment.NewLine + text);
+                File.AppendAllText(Paths.ScoreboardPath, Environment.NewLine + text);
             }
             catch (Exception ex)
             {
@@ -427,7 +442,7 @@ namespace StajProje2
         {
             List<ConsumableClass> consumables = new List<ConsumableClass> { };
 
-            using (StreamReader sr = new StreamReader(consPath))
+            using (StreamReader sr = new StreamReader(Paths.ConsPath))
             {
                 string line;
                 List<string> lines = new List<string>();
@@ -438,16 +453,16 @@ namespace StajProje2
 
                     ConsumableClass consumable = new ConsumableClass()
                     {
-                        name = cut[0],
-                        lifetime = float.Parse(cut[1]),
-                        spawnRate = float.Parse(cut[2]),
-                        point = float.Parse(cut[3]),
-                        color = ParseColorString(cut[4]),
-                        description = cut[5],
-                        spawned = false,
-                        expand = int.Parse(cut[6]),
-                        speedDown = int.Parse(cut[7]),
-                        speedUp = int.Parse(cut[8]),
+                        Name = cut[0],
+                        Lifetime = float.Parse(cut[1]),
+                        SpawnRate = float.Parse(cut[2]),
+                        Point = float.Parse(cut[3]),
+                        Color = ParseColorString(cut[4]),
+                        Description = cut[5],
+                        Spawned = false,
+                        Expand = int.Parse(cut[6]),
+                        SpeedDown = int.Parse(cut[7]),
+                        SpeedUp = int.Parse(cut[8]),
                     };
                     consumables.Add(consumable);
 
@@ -462,7 +477,7 @@ namespace StajProje2
         {
             List<ScoreClass> scores = new List<ScoreClass> { };
 
-            using (StreamReader sr = new StreamReader(scoreboardPath))
+            using (StreamReader sr = new StreamReader(Paths.ScoreboardPath))
             {
                 string line;
                 List<string> lines = new List<string>();
@@ -473,8 +488,8 @@ namespace StajProje2
 
                     ScoreClass score = new ScoreClass()
                     {
-                        username = cut[0],
-                        map = cut[1],
+                        Username = cut[0],
+                        Map = cut[1],
                         score = int.Parse(cut[2]),
                     };
                     scores.Add(score);
@@ -510,7 +525,7 @@ namespace StajProje2
             consumableList = ReadData_Consumables();
 
             var scores = ReadData_Scoreboard();
-            mapScores = scores.Where(p => p.map == selectedMap.Name).ToList();
+            mapScores = scores.Where(p => p.Map == selectedMap.Name).ToList();
 
             if (mapScores.Count() == 0)
             {
@@ -521,11 +536,11 @@ namespace StajProje2
                 var maxScore = mapScores.OrderByDescending(p => p.score).FirstOrDefault().score;
                 maxScoreLabel.Text = maxScore.ToString();
 
-                var yourScore = mapScores.Where(p => p.username == usernameInput).FirstOrDefault();
+                var yourScore = mapScores.Where(p => p.Username == usernameInput).FirstOrDefault();
 
                 if (yourScore != null)
                 {
-                    var yourMaxScore = mapScores.Where(p => p.username == usernameInput).OrderByDescending(p => p.score).FirstOrDefault().score;
+                    var yourMaxScore = mapScores.Where(p => p.Username == usernameInput).OrderByDescending(p => p.score).FirstOrDefault().score;
                     yourMaxLabel.Text = yourMaxScore.ToString();
                 }
                 else
@@ -538,7 +553,7 @@ namespace StajProje2
         private void Form_Load()
         {
             var scores = ReadData_Scoreboard();
-            mapScores = scores.Where(p => p.map == selectedMap.Name).ToList();
+            mapScores = scores.Where(p => p.Map == selectedMap.Name).ToList();
 
             if (mapScores.Count() == 0)
             {
@@ -549,11 +564,11 @@ namespace StajProje2
                 var maxScore = mapScores.OrderByDescending(p => p.score).FirstOrDefault().score;
                 maxScoreLabel.Text = maxScore.ToString();
 
-                var yourScore = mapScores.Where(p => p.username == usernameLabel.Text).FirstOrDefault();
+                var yourScore = mapScores.Where(p => p.Username == usernameLabel.Text).FirstOrDefault();
 
                 if (yourScore != null)
                 {
-                    var yourMaxScore = mapScores.Where(p => p.username == usernameLabel.Text).OrderByDescending(p => p.score).FirstOrDefault().score;
+                    var yourMaxScore = mapScores.Where(p => p.Username == usernameLabel.Text).OrderByDescending(p => p.score).FirstOrDefault().score;
                     yourMaxLabel.Text = yourMaxScore.ToString();
                 }
                 else
@@ -614,7 +629,7 @@ namespace StajProje2
             if (orderedList.Count() < 10) loopAmount = orderedList.Count();
             for (int i = 0; i < loopAmount; i++)
             {
-                metin += i + 1 + ") " + orderedList[i].username + ": " + orderedList[i].score + "\n";
+                metin += i + 1 + ") " + orderedList[i].Username + ": " + orderedList[i].score + "\n";
             }
             MessageBox.Show(metin);
         }
@@ -625,7 +640,7 @@ namespace StajProje2
             string metin = string.Empty;
             foreach (var consumable in consumableList)
             {
-                metin += consumable.name + ": " + consumable.description + "\n";
+                metin += consumable.Name + ": " + consumable.Description + "\n";
             }
             MessageBox.Show(metin);
         }

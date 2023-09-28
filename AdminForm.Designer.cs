@@ -73,6 +73,7 @@
             Controls.Add(mapButton);
             Name = "AdminForm";
             Text = "AdminForm";
+            Load += AdminForm_Load;
             ResumeLayout(false);
         }
 

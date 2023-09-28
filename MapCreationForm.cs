@@ -15,16 +15,10 @@ namespace StajProje2
 {
     public partial class MapCreationForm : Form
     {
-        static string mainPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-        static string mapPath = Path.Combine(mainPath, "Maps");
-        static string mapTxtPath = Path.Combine(mainPath, $"Maps\\maps.txt");
-
-        private const int gridSize = 20;
+        Paths Paths = new Paths();
+        Constant Constant = new Constant();
 
         static List<string> squares = new List<string>();
-
-
-
 
         public MapCreationForm()
         {
@@ -40,7 +34,7 @@ namespace StajProje2
         {
             List<MapClass> maps = new List<MapClass> { };
 
-            using (StreamReader sr = new StreamReader(mapTxtPath))
+            using (StreamReader sr = new StreamReader(Paths.MapsPath))
             {
                 string line;
                 List<string> lines = new List<string>();
@@ -51,7 +45,7 @@ namespace StajProje2
 
                     MapClass map = new MapClass()
                     {
-                       Name = cut[0],
+                        Name = cut[0],
                     };
                     maps.Add(map);
 
@@ -70,12 +64,12 @@ namespace StajProje2
             Point mouseLocationPanel = e.Location;
 
             // Kare için yeni konumu hesapla
-            int squareX = (mouseLocationPanel.X / gridSize) * gridSize;
-            int squareY = (mouseLocationPanel.Y / gridSize) * gridSize;
+            int squareX = (mouseLocationPanel.X / Constant.gridSize) * Constant.gridSize;
+            int squareY = (mouseLocationPanel.Y / Constant.gridSize) * Constant.gridSize;
 
             // Kare oluştur ve özelliklerini ayarla
             Panel square = new Panel();
-            square.Size = new Size(gridSize, gridSize);
+            square.Size = new Size(Constant.gridSize, Constant.gridSize);
             square.BackColor = Color.Black;
             square.Location = new Point(squareX, squareY);
 
@@ -147,7 +141,7 @@ namespace StajProje2
             var maps = ReadData_Map();
             var result = maps.Where(p => p.Name == nameBox.Text).ToList();
 
-            if(result.Count() != 0)
+            if (result.Count() != 0)
             {
                 MessageBox.Show("Bu isimde bir map mevcut.");
                 return;
@@ -156,7 +150,7 @@ namespace StajProje2
             if (pictureBox.Image != null) // image kısmında bir şey varsa
             {
                 string fileName = nameBox.Text + ".png";
-                string targetPath = Path.Combine(mapPath, fileName);
+                string targetPath = Path.Combine(Paths.MapsPath, fileName);
 
                 try
                 {
@@ -171,7 +165,7 @@ namespace StajProje2
 
                     try
                     {
-                        File.AppendAllText(mapTxtPath, Environment.NewLine + nameBox.Text + ";" + fileName + ";" + addSquare);
+                        File.AppendAllText(Paths.MapsPath, Environment.NewLine + nameBox.Text + ";" + fileName + ";" + addSquare);
                     }
                     catch (Exception ex)
                     {
@@ -198,7 +192,7 @@ namespace StajProje2
 
                 try
                 {
-                    File.AppendAllText(mapTxtPath, Environment.NewLine + nameBox.Text + ";" + nameBox.Text + ".png" + ";" + addSquare);
+                    File.AppendAllText(Paths.MapsPath, Environment.NewLine + nameBox.Text + ";" + nameBox.Text + ".png" + ";" + addSquare);
                 }
                 catch (Exception ex)
                 {
@@ -237,7 +231,7 @@ namespace StajProje2
                 g.CopyFromScreen(panelLocation, Point.Empty, panelSize);
             }
 
-            string filePath = Path.Combine(mapPath, nameBox.Text + ".png");
+            string filePath = Path.Combine(Paths.FolderPath, nameBox.Text + ".png");
             screenshot.Save(filePath, System.Drawing.Imaging.ImageFormat.Png);
         }
 
