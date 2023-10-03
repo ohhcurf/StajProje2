@@ -9,11 +9,13 @@ using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using StajProje2.Classes;
+using StajProje2.Classes.StajProje2.Classes;
 
 namespace StajProje2
 {
     public partial class Form1 : Form
     {
+        bool[,] grid = new bool[30, 30];
         Paths Paths = new Paths();
         static int consTimer;
         bool coolDown;
@@ -279,9 +281,7 @@ namespace StajProje2
         // Kendine veya engele çarpma kontrolü
         void Collision_Control()
         {
-            for (int i = 2; i < snake.Count; i++)
-            {
-                if (snake[0].Location == snake[i].Location)
+            if (grid[snake[0].Location.X / 20, snake[0].Location.Y / 20] == true)
                 {
                     gamePanel.Controls.Add(resultLabel);
                     resultLabel.Visible = true;
@@ -293,10 +293,8 @@ namespace StajProje2
                     scoreLimitTextBox.Enabled = true;
                     consTimer = 0;
                     Form_Load();
-                    return;
                 }
-
-            }
+            
 
             for (int i = 0; i < obstacles.Count; i++)
             {
@@ -384,6 +382,9 @@ namespace StajProje2
 
             snake.Insert(0, newHead);
             gamePanel.Controls.Add(newHead);
+            grid[snake[1].Location.X / 20, snake[1].Location.Y / 20] = true;
+
+            grid[snake[snake.Count() - 1].Location.X / 20, snake[snake.Count() - 1].Location.Y / 20] = false;
             gamePanel.Controls.Remove(snake[snake.Count() - 1]);
             snake.RemoveAt(snake.Count() - 1);
             newHead.Location = new Point(snakeX, snakeY);
@@ -523,6 +524,14 @@ namespace StajProje2
 
             string[] coordinateArray = coordinates.Split(',');
 
+            for(int i = 0; i < 30; i++)
+            {
+                for(int j = 0; j < 30; j++)
+                {
+                    grid[i, j] = false;
+                }
+            }
+
             foreach (string coordinate in coordinateArray)
             {
                 string[] xy = coordinate.Split('x');
@@ -536,6 +545,7 @@ namespace StajProje2
                     };
                     obstacles.Add(obstaclePanel);
                     gamePanel.Controls.Add(obstaclePanel);
+                    grid[int.Parse(xy[0]) / 20, int.Parse(xy[1]) / 20] = true;
                 }
                 else
                 {

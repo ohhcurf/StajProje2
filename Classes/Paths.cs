@@ -1,4 +1,5 @@
 ﻿using StajProje2.Classes;
+using StajProje2.Classes.StajProje2.Classes;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -17,7 +18,7 @@ namespace StajProje2
         public string MapsPath = Path.Combine(MainPath, "Maps\\maps.txt");
         public string FolderPath = Path.Combine(MainPath, "Maps");
 
-        static int lineNum;
+        public int lineNum;
 
         // Map verilerini oku
         public List<MapClass> ReadData_Map()
@@ -82,7 +83,7 @@ namespace StajProje2
                 return consumables;
             }
         }
-        
+
 
 
 

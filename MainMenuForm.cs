@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using StajProje2.Classes;
+using StajProje2.Classes.StajProje2.Classes;
 using static System.Windows.Forms.DataFormats;
 
 namespace StajProje2
@@ -68,18 +69,18 @@ namespace StajProje2
         {
             MapClass map = new MapClass();
 
-            if (lineNum == 1)
+            if (Paths.lineNum == 1)
             {
                 map = Paths.ReadData_Map(1, 1);
             }
             else
             {
-                lineNum -= 2;
+                Paths.lineNum -= 2;
                 map = Paths.ReadData_Map(1, 0);
             }
             if (map == null)
             {
-                lineNum = 0;
+                Paths.lineNum = 0;
                 map = Paths.ReadData_Map(1, 0);
             }
             Image originalImage = Image.FromFile(Path.Combine(Paths.FolderPath, map.Image));
